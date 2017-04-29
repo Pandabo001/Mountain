@@ -41,9 +41,8 @@ public class MapDataDrawer{
     return grid[0].length;
   }
   
-  /**
-   * @return the min value in the entire grid
-   */
+  
+
   public int findMinValue(){
     
     int min = grid[0][0];
@@ -58,9 +57,7 @@ public class MapDataDrawer{
   }
   
   
-  /**
-   * @return the max value in the entire grid
-   */
+
   public int findMaxValue(){
     
     int max = grid[0][0];
@@ -77,11 +74,37 @@ public class MapDataDrawer{
   }
   
   
-  public void drawMap(){
+
+  public int indexOfMinInCol(int col){
+    
+    int min = grid[0][col];
+    int minRow = 0;
+    for (int i = 1; i < grid.length; i++){
+      
+      if (grid[i][col] < min){
+        
+        min = grid[i][col];
+        minRow = i;
+      }
+    }
+    return minRow;
+  }
+  
+
+  public void drawMap(Graphics g){
     
   }
   
+
+  public int drawLowestElevPath(Graphics g, int row){
+    
+  }
   
+
+  public int indexOfLowestElevPath(Graphics g){
+    
+    
+  }
   
   
 }
