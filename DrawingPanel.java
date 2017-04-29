@@ -15,6 +15,20 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.PixelGrabber;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
@@ -24,8 +38,28 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.KeyStroke;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-public class DrawingPanel {
+public class DrawingPanel implements ActionListener, MouseMotionListener, WindowListener {
   
   // class constants
   public static final String ANIMATED_PROPERTY   = "drawingpanel.animated";
@@ -61,10 +95,22 @@ public class DrawingPanel {
     if (DEBUG) System.out.println("w = " + width + " ,h = " + height);
   }
   
-  
+  // used for an internal timer that keeps repainting
+  public void actionPerformed(ActionEvent e) {
+      
+    
+  }
   
   // obtain the Graphics object to draw on the panel
   public Graphics2D getGraphics() {
     return g2;
+  }
+  
+  // listens to mouse dragging
+  public void mouseDragged(MouseEvent e) {}
+    
+  // listens to mouse movement
+  public void mouseMoved(MouseEvent e) {
+    
   }
 }
