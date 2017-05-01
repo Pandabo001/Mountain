@@ -108,12 +108,9 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
         // look for the main thread in the current thread group
         Thread[] threads = new Thread[activeCount];
         group.enumerate(threads);
-        int i = 0;
-        while(i < threads.length) {
-          
+        for (int i = 0; i < threads.length; i++) {
             Thread thread = threads[i];
             String name = ("" + thread.getName()).toLowerCase();
-            
             if (name.indexOf("main") >= 0 || 
                 name.indexOf("testrunner-assignmentrunner") >= 0) {
               
@@ -121,8 +118,6 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
                 // (TestRunnerApplet's main runner also counts as "main" thread)
                 return thread.isAlive();
             }
-            
-            i++;
         }
         
         // didn't find a running main thread; guess that main is done running
@@ -163,13 +158,14 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     private JFrame frame;                  // overall window frame
     private JPanel panel;                  // overall drawing surface
     private ImagePanel imagePanel;         // real drawing surface
-    private BufferedImage img;           // remembers drawing commands
+    private BufferedImage image;           // remembers drawing commands
     private Graphics2D g2;                 // graphics context for painting
     private JLabel statusBar;              // status bar showing mouse position
     private JFileChooser chooser;          // file chooser to save files
     private long createTime;               // time at which DrawingPanel was constructed
     private Timer timer;                   // animation timer
     
+    // private FileOutputStream stream;
     private Color backgroundColor = Color.WHITE;
     private String callingClassName;       // name of class that constructed this panel
     private boolean animated = false;      // changes to true if sleep() is called
@@ -219,21 +215,21 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
         if (isAnimated() && shouldSave()) {
           
             // image must be no more than 256 colors
-            img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
+            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
             
             // image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             antiAlias = false;   // turn off anti-aliasing to save palette colors
             
             // initially fill the entire frame with the background color,
             // because it won't show through via transparency like with a full ARGB image
-            Graphics g = img.getGraphics();
+            Graphics g = image.getGraphics();
             g.setColor(backgroundColor);
             g.fillRect(0, 0, width + 1, height + 1);
         } else {
-            img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         }
         
-        g2 = (Graphics2D) img.getGraphics();
+        g2 = (Graphics2D) image.getGraphics();
         g2.setColor(Color.BLACK);
         if (antiAlias) {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -252,7 +248,7 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
             panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
             panel.setBackground(backgroundColor);
             panel.setPreferredSize(new Dimension(width, height));
-            imagePanel = new ImagePanel(img);
+            imagePanel = new ImagePanel(image);
             imagePanel.setBackground(backgroundColor);
             panel.add(imagePanel);
             
@@ -347,7 +343,6 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     
     // listens to mouse movement
     public void mouseMoved(MouseEvent e) {
-      
         int x = e.getX() / zoom;
         int y = e.getY() / zoom;
         setStatusBarText("(" + x + ", " + y + ")");
@@ -372,12 +367,9 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     
     // set the background color of the drawing panel
     public void setBackground(Color c) {
-      
         Color oldBackgroundColor = backgroundColor;
         backgroundColor = c;
-        
         if (isGraphical()) {
-          
             panel.setBackground(c);
             imagePanel.setBackground(c);
         }
@@ -385,13 +377,12 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
         // with animated images, need to palette-swap the old bg color for the new
         // because there's no notion of transparency in a palettized 8-bit image
         if (isAnimated()) {
-            replaceColor(img, oldBackgroundColor, c);
+            replaceColor(image, oldBackgroundColor, c);
         }
     }
     
     // show or hide the drawing panel on the screen
     public void setVisible(boolean visible) {
-      
         if (isGraphical()) {
             frame.setVisible(visible);
         }
@@ -431,13 +422,13 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     // to get the new graphics context of the newly enlarged image buffer.
     public void setSize(int width, int height) {
         // replace the image buffer for drawing
-        BufferedImage newImage = new BufferedImage(width, height, img.getType());
+        BufferedImage newImage = new BufferedImage(width, height, image.getType());
         imagePanel.setImage(newImage);
-        newImage.getGraphics().drawImage(img, 0, 0, imagePanel);
+        newImage.getGraphics().drawImage(image, 0, 0, imagePanel);
 
         this.width = width;
         this.height = height;
-        img = newImage;
+        image = newImage;
         g2 = (Graphics2D) newImage.getGraphics();
         g2.setColor(Color.BLACK);
         if (antiAlias) {
@@ -502,16 +493,13 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     
     // returns a best guess about the name of the class that constructed this panel
     private String getCallingClassName() {
-      
         StackTraceElement[] stack = new RuntimeException().getStackTrace();
         String className = this.getClass().getName();
-        
         for (StackTraceElement element : stack) {
             String cl = element.getClassName();
-            
             if (!className.equals(cl)) {
-              
-                className = cl; break;
+                className = cl;
+                break;
             }
         }
         
@@ -522,30 +510,25 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
         // create second image so we get the background color
         BufferedImage image2;
         if (isAnimated()) {
-          
-            image2 = new BufferedImage( width, height, BufferedImage.TYPE_BYTE_INDEXED);
-            
+            image2 = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
         } else {
-          
-            image2 = new BufferedImage( width, height, img.getType());
+            image2 = new BufferedImage(width, height, image.getType());
         }
         Graphics g = image2.getGraphics();
         if (DEBUG) System.out.println("getImage setting background to " + backgroundColor);
         g.setColor(backgroundColor);
         g.fillRect(0, 0, width, height);
-        g.drawImage(img, 0, 0, panel);
+        g.drawImage(image, 0, 0, panel);
         return image2;
     }
     
     
     
     private boolean isAnimated() {
-      
         return animated || propertyIsTrue(ANIMATED_PROPERTY);
     }
     
     private boolean isGraphical() {
-      
         return !hasProperty(SAVE_PROPERTY) && !hasProperty(HEADLESS_PROPERTY);
     }
     
@@ -559,11 +542,8 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     private void replaceColor(BufferedImage image, Color oldColor, Color newColor) {
         int oldRGB = oldColor.getRGB();
         int newRGB = newColor.getRGB();
-        
         for (int y = 0; y < image.getHeight(); y++) {
-          
             for (int x = 0; x < image.getWidth(); x++) {
-              
                 if (image.getRGB(x, y) == oldRGB) {
                     image.setRGB(x, y, newRGB);
                 }
@@ -581,7 +561,6 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     
     // sets the text that will appear in the bottom status bar
     private void setStatusBarText(String text) {
-      
         if (zoom != 1) {
             text += " (current zoom: " + zoom + "x" + ")";
         }
@@ -591,12 +570,10 @@ public class DrawingPanel implements ActionListener, MouseMotionListener, Window
     
     
     private boolean shouldDiff() {
-      
         return hasProperty(DIFF_PROPERTY);
     }
     
     private boolean shouldSave() {
-      
         return hasProperty(SAVE_PROPERTY);
     }
 
