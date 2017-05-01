@@ -1,15 +1,15 @@
 import java.awt.*;
 
 public class MountainPathMain{
-    
+  
   public static void main(String[] args){
-        
+    
     //construct DrawingPanel, and get its Graphics context
     DrawingPanel board = new DrawingPanel(844, 480);
     Graphics g = board.getGraphics();
     
     //Step 1 - construct mountain map data
-    MapDataDrawer map = new MapDataDrawer("Colorado_844x480.dat", 480, 844);
+    Map map = new Map("Colorado_844x480.dat", 480, 844);
     
     //Step 2 - min, max, minRow in col
     int min = map.findMinValue();
@@ -18,10 +18,13 @@ public class MountainPathMain{
     int max = map.findMaxValue();
     System.out.println("Max value in map: " + max);
     
-    for (int i = 0; i < map.getRows(); i++){
+    
+    int i = 0;
+    while(i < map.getRows()){
       
       
       System.out.println(map.grid[i][0]);
+      i++;
     }
     
     int minRow = map.indexOfMinInCol(0);
@@ -43,8 +46,8 @@ public class MountainPathMain{
     g.setColor(Color.GREEN); //set brush to green for drawing best path
     totalChange = map.drawLowestElevPath(g, bestRow);
     System.out.println("The Lowest-Elevation-Change Path starts at row: " + bestRow + " and gives a total change of: " + totalChange);
-        
+    
   }
-
-
+  
+  
 }
